@@ -1,0 +1,40 @@
+SELECT * FROM IPL2024;
+
+--Wins by Home and Away teams--
+SELECT COUNT(MATCH_NUMBER),
+SUM(CASE WHEN home_team = winner THEN 1 ELSE 0 END) AS HOME_WINS,
+SUM(CASE WHEN away_team = winner THEN 1 ELSE 0 END) AS AWAY_WINS
+FROM IPL2024;
+
+
+--Create a view to carry out further analysis--
+CREATE VIEW FINAL_TABLE AS 
+SELECT match_number, home_team AS TEAM,
+CASE 
+   WHEN home_team = winner THEN 2 ELSE 0
+END
+AS POINTS
+FROM IPL2024
+
+UNION ALL
+
+SELECT match_number, AWAY_team AS TEAM,
+CASE 
+   WHEN away_team = winner THEN 2 ELSE 0
+END  
+AS POINTS 
+FROM IPL2024;
+
+--Checking output of the created view--
+SELECT *
+FROM FINAL_TABLE 
+ORDER BY TEAM ASC,match_number;
+
+--Find the Wins, Losses, and Final Points of the team 
+SELECT TEAM, COUNT(*) AS MATCHES, 
+SUM(CASE WHEN POINTS =2 THEN 1 ELSE 0 END) AS WINS,
+SUM(CASE WHEN POINTS =0 THEN 1 ELSE 0 END) AS LOSSES,
+SUM(POINTS) AS FULLPOINTS
+FROM FINAL_TABLE 
+GROUP BY TEAM
+ORDER BY FULLPOINTS DESC;
